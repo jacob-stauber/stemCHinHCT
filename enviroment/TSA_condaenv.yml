@@ -1,0 +1,38 @@
+#Conda environment for TargetedSeqAnalysis
+#Last revised March 23, 2022
+name: TSA
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+# core tools
+- bioconda::gatk4=4.2.5.0
+- bioconda::fastqc=0.11.9
+- bioconda::bwa=0.7.17
+- bioconda::fastqc=0.11.9
+- bioconda::fgbio=1.5.1
+- bioconda::samtools=1.15
+- bioconda::trimmomatic=0.39
+- bioconda::fastqc=0.11.9
+- bioconda::mosdepth=0.3.3
+- bioconda::multiqc=1.12
+- bioconda::vcftools=0.1.16
+
+# core dependencies
+- conda-forge::python=3.10.2                        
+- conda-forge::openjdk=8.0.312
+#- conda-forge::perl=5.32.1
+
+# core R dependencies
+- r-base=3.6.2
+- r-gsalib=2.1
+#- r-data.table=1.12.8
+#- r-dplyr=0.8.5
+#- r-getopt=1.20.3
+#- r-ggplot2=3.3.0
+#- r-gplots=3.0.3
+#- r-optparse=1.6.4
+#- r-backports=1.1.10
+
+# other dependencies; these are for packages that may require a specific version
