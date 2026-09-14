@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/979017525.svg)](https://doi.org/10.5281/zenodo.15353392)
 
-**Authors:** Jacob Stauber, Oliver Bohorquez, Catherine Jankovic, Caner Saygin, Sriram Sundaravel, Jong Jeong, Satyajit Kosuri, Michael Bishop, Amittha Wickrema, John Greally, Ulrich Steidl
+**Authors:** Jacob Stauber, Oliver Bohorquez, Catherine Jankovic, Caner Saygin, Sriram Sundaravel, Jong Jeong, Oren Weiss, Satyajit Kosuri, Michael Bishop, Amittha Wickrema, John Greally, Ulrich Steidl
 
 ## Study Overview
 
@@ -25,11 +25,16 @@ The code provided in this repository was used for the bioinformatics analysis of
     * Variant Quality Score Recalibration (VQSR) to filter high-confidence germline SNPs.
     * Calculation of donor chimerism in recipient samples using informative germline SNPs.
 
-3.  **Somatic Variant Refinement and Analysis (`scripts/R/01.prelim-analysis.r`, `scripts/R/02.forcecall.r`, `scripts/shell/ForceCall.sh`, `scripts/R/03.final-vars.r`):**
+3.  **Somatic Variant Analysis (`scripts/R/01.prelim-analysis.r`, `scripts/R/02.forcecall.r`, `scripts/shell/ForceCall.sh`, `scripts/R/03.final-vars.r`):**
     * **Preliminary Filtering (`01.prelim-analysis.r`):** Initial filtering of somatic variant calls from `TargetedSeqAnalysis.v3.sh` based on read depth, allele frequency, and quality metrics.
     * **Force Calling Preparation (`02.forcecall.r`):** Identification of variants for deeper investigation across all samples within specific donor-recipient groups.
     * **Force Calling Execution (`ForceCall.sh`):** Re-running GATK Mutect2 in "force-call" mode to assess the presence and VAF of selected variants in every sample of a group, even if not initially called.
     * **Final Variant Curation (`03.final-vars.r`):** Integration of force-called results, chimerism data, and annotations. Application of final filters and manual review (based on an external review file) to produce the definitive list of CH variants for the study.
+
+4.  **Pre- vs Post-Mobilization Clonal Dynamics (`scripts/R/04.mobilization-analysis.r`):**
+    * Pairing of donor pre-mobilization and day 1 apheresis samples.
+    * Correction of CD34+ VAFs for residual mature cell contamination using flow cytometry-determined CD34 purity.
+    * Classification of clonal shifts in each compartment by two-proportion Z-test, with contamination variance propagated by the delta method.
 
 The `scripts/shell/config.hpc3.sh` file contains paths and settings used by the shell scripts, and `environment/TSA_condaenv.yml` defines the Conda environment for the primary analysis pipeline.
 
@@ -37,13 +42,12 @@ The `scripts/shell/config.hpc3.sh` file contains paths and settings used by the 
 
 This file contains the final dataset of all donor derived non-synonymous somatic variants tracked in the study, after all filtering and processing steps. The data is provided in 'tidy' format.
 
-
 ### Key Columns:
 
 * `Group`: Donor-recipient pair ID.
 * `SampleType`: Indicates if the sample is from the "DONOR" or recipient "BLOOD" or "MARROW".
 * `SampleTimepoint`: Descriptive timepoint of sample collection.
-* `Time`: Numeric time relative to transplant in days.
+* `Time`: Numeric time relative to transplant in days. (Donor pre-mobilization samples are coded as -10)
 * `CellPopulation`: The cell population from which DNA was extracted.
 * `Library_ID`: Unique identifier for the sequencing library.
 * `VCFVAR`: Variant representation in CHR-POS-REF-ALT format.
@@ -60,3 +64,20 @@ This file contains the final dataset of all donor derived non-synonymous somatic
 * `IN_SCREEN`: Boolean flag indicating if the variant was identified during the screening phase.
 * `DonorChimerism`: The calculated donor chimerism for the recipient sample at the given timepoint and cell population.
 * `ChimerismSD`: The standard deviation of the chimerism measurement.
+
+## Data File: `MetadataIDs.csv`
+
+Sample-level metadata for every sequencing library in the study.
+
+### Key Columns:
+
+* `Library_ID`: Unique identifier for the sequencing library.
+* `Group`: Donor-recipient pair ID.
+* `SampleType`: Indicates if the sample is from the "DONOR" or recipient "BLOOD" or "MARROW".
+* `SampleTimepoint`: Descriptive timepoint of sample collection.
+* `CellPopulation`: The cell population from which DNA was extracted.
+* `CD34Enrichment`: CD34 purity of the fraction (%), determined by flow cytometry. Populated for CD34+ fractions only.
+* `Time`: Numeric time relative to transplant in days. (Donor pre-mobilization samples are coded as -10)
+
+
+
